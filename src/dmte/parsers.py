@@ -1,43 +1,15 @@
 # coding=utf-8
+'''
+Парсеры данных.
+@author: Mic, 2012
+'''
 
 from datetime import date
 from re import search, UNICODE
-from urllib import urlopen
 
 from lxml import etree
 
-def get_page_content(url):
-    '''
-    Скачивает и возвращает содержимое страницы.
-    @param url: str
-    @return: str
-    '''
-    response = urlopen(url)
-    response_body = response.read()
-    return response_body.decode('cp1251')
-
-class Advert(object):
-    '''
-    Объявление.
-    '''
-    
-    def __init__(self):
-        self.external_id = None
-        self.age = None
-        self.district = None
-        self.address = None
-        self.floor_number = None
-        self.floor_count = None
-        self.area = None
-        self.room_count = None
-        self.price = None
-        self.publication_date = None
-        
-    def __str__(self):
-        attrs = []
-        for key, value in self.__dict__.items():
-            attrs.append('%s=%s'%(key, value))
-        return 'Advert(%s)'%', '.join(attrs)
+from dmte.models import Advert
 
 class AdvertParser(object):
     '''
@@ -70,21 +42,23 @@ class AdvertParser(object):
             raise Exception('no age found')
         return found.group(1)
     
-    def _get_normalized_district(self, raw_value):
+    def _get_normalized_district(self, district):
         '''
         Возвращает нормализованное название района.
-        @param raw_value: str
+        @param district: str
         @return: str
         '''
-        if raw_value == 'Кировском':
+        if district == 'Кировском':
             return 'Кировский'
-        if raw_value == 'Ленинском':
+        if district == 'Ленинском':
             return 'Ленинский'
-        if raw_value == 'Октябрьском':
+        if district == 'Октябрьском':
             return 'Октябрьский'
-        if raw_value == 'Советском':
+        if district == 'Советском':
             return 'Советский'
-        raise Exception('can not normalize district "%s"'%raw_value)
+        if district == 'Томском':
+            return 'Томский'
+        raise Exception('can not normalize district "%s"'%district)
     
     def _get_district(self, advert_node):
         '''
@@ -253,9 +227,3 @@ class AdvertListParser(object):
         for advert_node in root_node.findall('.//tr[@class="realty_ad_text_1"]'):
             parser = AdvertParser()
             yield parser.parse(advert_node)
-
-content = get_page_content('http://www.tomsk.ru09.ru/realty?listview=1&type=1&otype=1')
-root_node = etree.fromstring(content, parser=etree.HTMLParser())
-parser = AdvertListParser()
-for advert in parser.parse(root_node):
-    print str(advert)
