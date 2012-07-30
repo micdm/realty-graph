@@ -4,7 +4,7 @@
 @author: Mic, 2012
 '''
 
-from datetime import date
+from datetime import datetime
 from re import search, UNICODE
 
 from lxml import etree
@@ -180,7 +180,7 @@ class AdvertParser(object):
             return 12
         raise Exception('can not define number for month "%s"'%month)
     
-    def _get_publication_date(self, advert_node):
+    def _get_publication_datetime(self, advert_node):
         '''
         Возвращает дату публикации объявления.
         @param advert_node: Element
@@ -192,7 +192,7 @@ class AdvertParser(object):
         if found is None:
             raise Exception('no publication date found')
         day, month, year = int(found.group(1)), self._get_month_number(found.group(2)), int(found.group(3))
-        return date(year, month, day)
+        return datetime(year, month, day)
     
     def parse(self, advert_node):
         '''
@@ -210,7 +210,7 @@ class AdvertParser(object):
         advert.area = self._get_area(advert_node)
         advert.room_count = self._get_room_count(advert_node)
         advert.price = self._get_price(advert_node)
-        advert.publication_date = self._get_publication_date(advert_node)
+        advert.publication_date = self._get_publication_datetime(advert_node)
         return advert
     
 class AdvertListParser(object):

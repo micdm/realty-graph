@@ -10,6 +10,7 @@ class Advert(object):
     '''
     
     def __init__(self):
+        self.id = None
         self.external_id = None
         self.age = None
         self.district = None
