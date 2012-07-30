@@ -23,7 +23,4 @@ class Advert(object):
         self.publication_date = None
         
     def __str__(self):
-        attrs = []
-        for key, value in self.__dict__.items():
-            attrs.append('%s=%s'%(key, value))
-        return 'Advert(%s)'%', '.join(attrs)
+        return 'Advert(#%s)'%self.external_id

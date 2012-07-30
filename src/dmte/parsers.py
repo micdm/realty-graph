@@ -9,7 +9,13 @@ from re import search, UNICODE
 
 from lxml import etree
 
+from dmte.log import logger
 from dmte.models import Advert
+
+class ParserException(Exception):
+    '''
+    Ошибка при разборе.
+    '''
 
 class AdvertParser(object):
     '''
@@ -26,7 +32,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search('id=(\d+)', node.attrib['href'])
         if found is None:
-            raise Exception('no external id found')
+            raise ParserException('no external id found')
         return found.group(1)
     
     def _get_age(self, advert_node):
@@ -39,7 +45,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search(u'\((\w+)\)', node.text, UNICODE)
         if found is None:
-            raise Exception('no age found')
+            raise ParserException('no age found')
         return found.group(1)
     
     def _get_normalized_district(self, district):
@@ -48,17 +54,17 @@ class AdvertParser(object):
         @param district: str
         @return: str
         '''
-        if district == 'Кировском':
-            return 'Кировский'
-        if district == 'Ленинском':
-            return 'Ленинский'
-        if district == 'Октябрьском':
-            return 'Октябрьский'
-        if district == 'Советском':
-            return 'Советский'
-        if district == 'Томском':
-            return 'Томский'
-        raise Exception('can not normalize district "%s"'%district)
+        if district == u'Кировском':
+            return u'Кировский'
+        if district == u'Ленинском':
+            return u'Ленинский'
+        if district == u'Октябрьском':
+            return u'Октябрьский'
+        if district == u'Советском':
+            return u'Советский'
+        if district == u'Томском':
+            return u'Томский'
+        raise ParserException(u'can not normalize district "%s"'%district.encode('utf8'))
     
     def _get_district(self, advert_node):
         '''
@@ -70,7 +76,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search(u'в (\w+) районе', node.text, UNICODE)
         if found is None:
-            raise Exception('no district found')
+            raise ParserException('no district found')
         return self._get_normalized_district(found.group(1))
     
     def _get_address(self, advert_node):
@@ -80,8 +86,10 @@ class AdvertParser(object):
         @return: str
         '''
         xpath = etree.XPath('.//p[2]/a[@class="map_link"]')
-        node = xpath(advert_node)[0]
-        return node.text
+        nodes = xpath(advert_node)
+        if not nodes:
+            raise ParserException('no address found')
+        return nodes[0].text
     
     def _get_floor_number(self, advert_node):
         '''
@@ -93,7 +101,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search(u'на (\d+)-м этаже', node.text, UNICODE)
         if found is None:
-            raise Exception('no floor found')
+            raise ParserException('no floor found')
         return int(found.group(1))
     
     def _get_floor_count(self, advert_node):
@@ -106,7 +114,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search(u'в (\d+)-этажном', node.text, UNICODE)
         if found is None:
-            raise Exception('no floor found')
+            raise ('no floor found')
         return int(found.group(1))
 
     def _get_area(self, advert_node):
@@ -120,7 +128,7 @@ class AdvertParser(object):
         node_text = etree.tostring(node, encoding='utf8', method='text').decode('utf8')
         found = search(u'общей площадью (\d+(\.\d+)*)', node_text, UNICODE)
         if found is None:
-            raise Exception('no area found')
+            raise ParserException('no area found')
         return float(found.group(1))
     
     def _get_room_count(self, advert_node):
@@ -135,7 +143,7 @@ class AdvertParser(object):
             return None
         found = search(u'(\d+)-комнатную', node.text, UNICODE)
         if found is None:
-            raise Exception('no room count found')
+            raise ParserException('no room count found')
         return int(found.group(1))
     
     def _get_price(self, advert_node):
@@ -144,7 +152,7 @@ class AdvertParser(object):
         @param advert_node: Element
         @return: float
         '''
-        xpath = etree.XPath('.//p[4]/b')
+        xpath = etree.XPath('.//p[@style="margin: 10px 0 0 2px;"]/b')
         node = xpath(advert_node)[0]
         return float(node.text) * 1000
     
@@ -178,7 +186,7 @@ class AdvertParser(object):
             return 11
         if month == u'декабря':
             return 12
-        raise Exception('can not define number for month "%s"'%month)
+        raise ParserException('can not define number for month "%s"'%month.encode('utf8'))
     
     def _get_publication_datetime(self, advert_node):
         '''
@@ -186,11 +194,13 @@ class AdvertParser(object):
         @param advert_node: Element
         @return: datetime
         '''
-        xpath = etree.XPath('.//p[6]')
+        xpath = etree.XPath('.//p[@class="absmiddle"]')
         node = xpath(advert_node)[0]
+        if u'Опубликовано сегодня' in node.text:
+            return datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
         found = search(u'(\d{1,2}) (\w+) (\d{4})', node.text, UNICODE)
         if found is None:
-            raise Exception('no publication date found')
+            raise ParserException('no publication date found')
         day, month, year = int(found.group(1)), self._get_month_number(found.group(2)), int(found.group(3))
         return datetime(year, month, day)
     
@@ -218,12 +228,27 @@ class AdvertListParser(object):
     Парсер списка объявлений.
     '''
     
-    def parse(self, root_node):
+    def parse_adverts(self, root_node):
         '''
         Разбирает и возвращает список объявлений.
         @param root_node: Element
         @return: list
         '''
-        for advert_node in root_node.findall('.//tr[@class="realty_ad_text_1"]'):
+        for advert_node in root_node.findall('.//table[@class="realty"]//tr[@class]'):
             parser = AdvertParser()
-            yield parser.parse(advert_node)
+            try:
+                yield parser.parse(advert_node)
+            except ParserException as e:
+                logger.warning('can not parse advert: %s', e)
+            
+    def parse_next_page_address(self, root_node):
+        '''
+        Находит и возвращает адрес следующей страницы.
+        @param root_node: Element
+        @return: str
+        '''
+        xpath = etree.XPath('.//span[@class="pager_next"]/a')
+        nodes = xpath(root_node)
+        if not nodes:
+            return None
+        return nodes[0].attrib['href']

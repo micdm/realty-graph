@@ -1,5 +1,7 @@
 # coding=utf8
 
+from time import sleep
+
 from lxml import etree
 
 from dmte.loaders import get_page_content
@@ -15,13 +17,20 @@ def save_advert(advert):
         advert.id = stored.id
     processor.save(advert)
 
-def parse_adverts(url):
-    logger.debug('parsing advert on %s', url)
+def parse_page(url):
+    logger.debug('parsing adverts on %s', url)
     content = get_page_content(url)
     root_node = etree.fromstring(content, parser=etree.HTMLParser())
     parser = AdvertListParser()
-    for advert in parser.parse(root_node):
+    for advert in parser.parse_adverts(root_node):
         logger.debug('new advert %s found', str(advert))
         save_advert(advert)
+    return parser.parse_next_page_address(root_node)
 
-parse_adverts('http://www.tomsk.ru09.ru/realty?listview=1&type=1&otype=1')
+def parse_all():
+    next_url = '/realty/?type=1&otype=1&listview=1&perpage=50'
+    while next_url:
+        next_url = parse_page('http://www.tomsk.ru09.ru%s'%next_url)
+        sleep(1)
+
+parse_all()
