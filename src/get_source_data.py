@@ -4,9 +4,9 @@ from time import sleep
 
 from lxml import etree
 
-from dmte.loaders import get_page_content
+from dmte.source_data.loaders import get_page_content
 from dmte.log import logger
-from dmte.parsers import AdvertListParser
+from dmte.source_data.parsers import AdvertListParser
 from dmte.processors import AdvertProcessor
 
 def save_advert(advert):
