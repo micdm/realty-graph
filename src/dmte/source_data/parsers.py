@@ -1,4 +1,4 @@
-# coding=utf8
+# encoding=utf8
 '''
 Парсеры данных.
 @author: Mic, 2012

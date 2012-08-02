@@ -1,4 +1,4 @@
-# coding=utf8
+# encoding=utf8
 '''
 Страницы для сайта.
 @author: Mic, 2012

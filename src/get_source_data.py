@@ -1,4 +1,4 @@
-# coding=utf8
+# encoding=utf8
 
 from time import sleep
 
