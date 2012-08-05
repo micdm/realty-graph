@@ -23,10 +23,10 @@
                 <div class="row">
                     <div class="span2">
                         <label>Возраст</label>
-                        <select name="age" class="span2">
+                        <select name="type" class="span2">
                             <option value="" selected>&mdash;</option>
-                            {% for age in aggregated.age %}
-                            <option value="{{ age }}">{{ age|capitalize }}</option>
+                            {% for type in aggregated.type %}
+                            <option value="{{ type }}">{{ type|capitalize }}</option>
                             {% endfor %}
                         </select>
                     </div>

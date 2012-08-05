@@ -12,7 +12,7 @@ class Advert(object):
     def __init__(self):
         self.id = None
         self.external_id = None
-        self.age = None
+        self.type = None
         self.district = None
         self.address = None
         self.floor_number = None

@@ -35,9 +35,9 @@ class AdvertParser(object):
             raise ParserException('no external id found')
         return found.group(1)
     
-    def _get_age(self, advert_node):
+    def _get_type(self, advert_node):
         '''
-        Возвращает возраст (первичное, вторичное).
+        Возвращает тип (первичное, вторичное).
         @param advert_node: Element
         @return: str
         '''
@@ -45,7 +45,7 @@ class AdvertParser(object):
         node = xpath(advert_node)[0]
         found = search(u'\((\w+)\)', node.text, UNICODE)
         if found is None:
-            raise ParserException('no age found')
+            raise ParserException('no type found')
         return found.group(1)
     
     def _get_normalized_district(self, district):
@@ -210,7 +210,7 @@ class AdvertParser(object):
         '''
         advert = Advert()
         advert.external_id = self._get_external_id(advert_node)
-        advert.age = self._get_age(advert_node)
+        advert.type = self._get_type(advert_node)
         advert.district = self._get_district(advert_node)
         advert.address = self._get_address(advert_node)
         advert.floor_number = self._get_floor_number(advert_node)

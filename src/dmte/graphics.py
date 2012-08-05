@@ -58,24 +58,15 @@ class GraphBuilder(object):
         image_height = 600
         image = Image.new('RGB', (image_width, image_height), 0xFFFFFF)
         draw = ImageDraw.Draw(image)
-        
-        prepared = [(int(key.strftime('%s')), value) for key, value in average.items()]
-        prepared.sort(key=lambda item: item[0])
-        
-        x_values = [value for value, _ in prepared]
-        y_values = [value for _, value in prepared]
-        
-        step_x = image_width / float(max(x_values) - min(x_values))
-        step_y = image_height / float(max(y_values))
-
-        points = [((point_x - min(x_values)) * step_x, image_height - point_y * step_y) for point_x, point_y in zip(x_values, y_values)]
-        draw.line(points, fill=0, width=1)
-
-#        for point_x, point_y in zip(x_values, y_values):
-#            x = (point_x - min(x_values)) * step_x
-#            y = image_height - point_y * step_y
-#            print x, y 
-#            draw.line((x, y), fill=0, width=2)
+        if average:
+            prepared = [(int(key.strftime('%s')), value) for key, value in average.items()]
+            prepared.sort(key=lambda item: item[0])
+            x_values = [value for value, _ in prepared]
+            y_values = [value for _, value in prepared]
+            step_x = image_width / float(max(x_values) - min(x_values))
+            step_y = image_height / float(max(y_values))
+            points = [((point_x - min(x_values)) * step_x, image_height - point_y * step_y) for point_x, point_y in zip(x_values, y_values)]
+            draw.line(points, fill=0, width=1)
         image.save('/tmp/image.png', format='PNG')
         return open('/tmp/image.png').read()
     

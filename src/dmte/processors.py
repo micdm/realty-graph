@@ -39,7 +39,7 @@ class MongoDb(object):
 class AdvertProcessor(object):
     
     # Поля, которые нужно сохранять в БД:
-    FIELDS = ('external_id', 'age', 'district', 'address', 'floor_number', 'floor_count', 
+    FIELDS = ('external_id', 'type', 'district', 'address', 'floor_number', 'floor_count', 
               'area', 'room_count', 'price', 'publication_date')
 
     def _convert_advert_to_document(self, advert):
@@ -83,7 +83,7 @@ class AdvertProcessor(object):
         @return: dict
         '''
         aggregated = {}
-        for field in ('age', 'district', 'floor_number', 'room_count'):
+        for field in ('type', 'district', 'floor_number', 'room_count'):
             values = self._collection.distinct(field)
             aggregated[field] = sorted(values)
         return aggregated

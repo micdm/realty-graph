@@ -18,7 +18,7 @@ def index():
     '''
     processor = AdvertProcessor()
     aggregated = processor.get_aggregated()
-    graph_url = url_for('graph', age=request.args.get('age') or 'all', district=request.args.get('district') or 'all',
+    graph_url = url_for('graph', type=request.args.get('type') or 'all', district=request.args.get('district') or 'all',
                         floor_number=request.args.get('floor_number') or 0, room_count=request.args.get('room_count') or 0)
     return render_template('index.html', aggregated=aggregated, graph_url=graph_url)
 
@@ -43,7 +43,7 @@ def _validate_graph_params(params):
     '''
     processor = AdvertProcessor()
     aggregated = processor.get_aggregated()
-    if not _validate_graph_param(aggregated, params, 'age', 'all'):
+    if not _validate_graph_param(aggregated, params, 'type', 'all'):
         return False
     if not _validate_graph_param(aggregated, params, 'district', 'all'):
         return False
@@ -53,7 +53,7 @@ def _validate_graph_params(params):
         return False
     return True
 
-@app.route('/graph/<age>/<district>/<int:floor_number>/<int:room_count>/')
+@app.route('/graph/<type>/<district>/<int:floor_number>/<int:room_count>/')
 def graph(**kwargs):
     '''
     Генератор графиков.

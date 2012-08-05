@@ -28,7 +28,7 @@ def parse_page(url):
     return parser.parse_next_page_address(root_node)
 
 def parse_all():
-    next_url = '/realty/?type=1&otype=1&listview=1&perpage=50'
+    next_url = '/realty/?type=1&otype=1&listview=1&perpage=200'
     while next_url:
         next_url = parse_page('http://www.tomsk.ru09.ru%s'%next_url)
         sleep(1)
