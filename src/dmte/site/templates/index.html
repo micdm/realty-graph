@@ -20,8 +20,54 @@
         <div class="container">
             <h2>Выберите критерии</h2>
             <form action="" method="get">
-                
+                <div class="row">
+                    <div class="span2">
+                        <label>Возраст</label>
+                        <select name="age" class="span2">
+                            <option value="" selected>&mdash;</option>
+                            {% for age in aggregated.age %}
+                            <option value="{{ age }}">{{ age|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="span2">
+                        <label>Район</label>
+                        <select name="district" class="span2">
+                            <option value="" selected>&mdash;</option>
+                            {% for district in aggregated.district %}
+                            <option value="{{ district }}">{{ district|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="span1">
+                        <label>Этаж</label>
+                        <select name="floor_number" class="span1">
+                            <option value="" selected>&mdash;</option>
+                            {% for floor_number in aggregated.floor_number %}
+                            <option value="{{ floor_number }}">{{ floor_number }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="span1">
+                        <label>Комнаты</label>
+                        <select name="room_count" class="span1">
+                            <option value="" selected>&mdash;</option>
+                            {% for room_count in aggregated.room_count %}
+                            <option value="{{ room_count }}">{{ room_count }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="span1">
+                        <label>Выбрали?</label>
+                        <input type="submit" value="Показать &rarr;" class="btn">
+                    </div>
+                </div>
             </form>
+            <div class="row">
+                <div class="span12">
+                    <img src="{{ graph_url }}" alt="Динамика цен">
+                </div>
+            </div>
         </div>
     </body>
 </html>

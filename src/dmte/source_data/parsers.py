@@ -55,15 +55,15 @@ class AdvertParser(object):
         @return: str
         '''
         if district == u'Кировском':
-            return u'Кировский'
+            return u'кировский'
         if district == u'Ленинском':
-            return u'Ленинский'
+            return u'ленинский'
         if district == u'Октябрьском':
-            return u'Октябрьский'
+            return u'октябрьский'
         if district == u'Советском':
-            return u'Советский'
+            return u'советский'
         if district == u'Томском':
-            return u'Томский'
+            return u'томский'
         raise ParserException(u'can not normalize district "%s"'%district.encode('utf8'))
     
     def _get_district(self, advert_node):
@@ -139,8 +139,6 @@ class AdvertParser(object):
         '''
         xpath = etree.XPath('.//a[@class="visited_ads"]')
         node = xpath(advert_node)[0]
-        if node.text == u'комнату':
-            return None
         found = search(u'(\d+)-комнатную', node.text, UNICODE)
         if found is None:
             raise ParserException('no room count found')

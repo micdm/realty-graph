@@ -69,12 +69,24 @@ class AdvertProcessor(object):
             setattr(advert, field_name, document[field_name])
         return advert
     
-    def _get_collection(self):
+    @property
+    def _collection(self):
         '''
         Возвращает коллекцию для объявлений.
         @return: Collection
         '''
         return MongoDb.get().adverts
+    
+    def get_aggregated(self):
+        '''
+        Возвращает все возможные значения для полей.
+        @return: dict
+        '''
+        aggregated = {}
+        for field in ('age', 'district', 'floor_number', 'room_count'):
+            values = self._collection.distinct(field)
+            aggregated[field] = sorted(values)
+        return aggregated
     
     def get_by_external_id(self, external_id):
         '''
@@ -82,15 +94,21 @@ class AdvertProcessor(object):
         @param external_id: int
         @return: Advert
         '''
-        collection = self._get_collection()
-        document = collection.find_one({'external_id': external_id})
+        document = self._collection.find_one({'external_id': external_id})
         return self._convert_document_to_advert(document)
+    
+    def get_by_info(self, **kwargs):
+        '''
+        Возвращает список объявлений по указанным параметрам.
+        @return: list
+        '''
+        documents = self._collection.find(kwargs)
+        return map(self._convert_document_to_advert, documents)
     
     def save(self, advert):
         '''
         Сохраняет объявление в БД.
         @param advert: Advert
         '''
-        collection = self._get_collection()
         document = self._convert_advert_to_document(advert)
-        advert.id = collection.insert(document)
+        advert.id = self._collection.insert(document)
