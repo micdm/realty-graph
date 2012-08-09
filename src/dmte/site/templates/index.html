@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Недвижимость Томска в картинках</title>
+        <title>Недвижимость Томска в графиках</title>
         <meta charset="utf-8">
         <link href="/static/css/bootstrap.css" rel="stylesheet">
         <link href="/static/css/extra.css" rel="stylesheet">
@@ -13,59 +13,78 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="/">Недвижимость Томска в картинках</a>
+                    <a class="brand" href="/">Недвижимость Томска в графиках</a>
                 </div>
             </div>
         </div>
         <div class="container">
-            <h2>Выберите критерии</h2>
-            <form action="" method="get">
-                <div class="row">
-                    <div class="span2">
-                        <label>Тип</label>
-                        <select name="type" class="span2">
-                            <option value="" selected>&mdash;</option>
-                            {% for type in aggregated.type %}
-                            <option value="{{ type }}">{{ type|capitalize }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="span2">
-                        <label>Район</label>
-                        <select name="district" class="span2">
-                            <option value="" selected>&mdash;</option>
-                            {% for district in aggregated.district %}
-                            <option value="{{ district }}">{{ district|capitalize }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="span1">
-                        <label>Этаж</label>
-                        <select name="floor_number" class="span1">
-                            <option value="" selected>&mdash;</option>
-                            {% for floor_number in aggregated.floor_number %}
-                            <option value="{{ floor_number }}">{{ floor_number }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="span1">
-                        <label>Комнаты</label>
-                        <select name="room_count" class="span1">
-                            <option value="" selected>&mdash;</option>
-                            {% for room_count in aggregated.room_count %}
-                            <option value="{{ room_count }}">{{ room_count }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="span1">
-                        <label>Выбрали?</label>
-                        <input type="submit" value="Показать &rarr;" class="btn">
-                    </div>
+            <div class="row">
+                <div class="span12">
+                    <h2>Выберите критерии</h2>
+                    <form action="" method="get">
+                        <div class="row">
+                            <div class="span2">
+                                <label>Тип</label>
+                                <select name="type" class="span2">
+                                    <option value="" selected>&mdash;</option>
+                                    {% for type in aggregated.type %}
+                                    <option value="{{ type }}">{{ type|capitalize }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="span2">
+                                <label>Район</label>
+                                <select name="district" class="span2">
+                                    <option value="" selected>&mdash;</option>
+                                    {% for district in aggregated.district %}
+                                    <option value="{{ district }}">{{ district|capitalize }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="span1">
+                                <label>Этаж</label>
+                                <select name="floor_number" class="span1">
+                                    <option value="" selected>&mdash;</option>
+                                    {% for floor_number in aggregated.floor_number %}
+                                    <option value="{{ floor_number }}">{{ floor_number }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="span1">
+                                <label>Комнаты</label>
+                                <select name="room_count" class="span1">
+                                    <option value="" selected>&mdash;</option>
+                                    {% for room_count in aggregated.room_count %}
+                                    <option value="{{ room_count }}">{{ room_count }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="span1">
+                                <label>Выбрали?</label>
+                                <input type="submit" value="Показать &rarr;" class="btn">
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
             <div class="row">
                 <div class="span12">
                     <img src="{{ graph_url }}" alt="Динамика цен">
+                </div>
+            </div>
+            <div class="row">
+                <div class="span12">
+                    <p>На графике показана динамика средних цен в рублях за квадратный метр.</p>
+                    <p>Данные получены с одного популярного томского сайта с бесплатными объявлениями о недвижимости.</p>
+                </div>
+            </div>
+        </div>
+        <div class="navbar navbar-fixed-bottom">
+            <div class="navbar-inner">
+                <div class="container">
+                    <ul class="nav pull-right">
+                        <li><a href="/">&copy; Mic, 2012</a></li>
+                    </ul>
                 </div>
             </div>
         </div>

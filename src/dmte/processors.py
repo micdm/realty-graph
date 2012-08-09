@@ -86,6 +86,8 @@ class AdvertProcessor(object):
         for field in ('type', 'district', 'floor_number', 'room_count'):
             values = self._collection.distinct(field)
             aggregated[field] = sorted(values)
+        aggregated['floor_number'] = filter(lambda value: value <= 10, aggregated['floor_number'])
+        aggregated['room_count'] = filter(lambda value: value <= 5, aggregated['room_count'])
         return aggregated
     
     def get_by_external_id(self, external_id):
@@ -97,12 +99,13 @@ class AdvertProcessor(object):
         document = self._collection.find_one({'external_id': external_id})
         return self._convert_document_to_advert(document)
     
-    def get_by_info(self, **kwargs):
+    def get_by_info(self, params):
         '''
         Возвращает список объявлений по указанным параметрам.
+        @param params: dict
         @return: list
         '''
-        documents = self._collection.find(kwargs)
+        documents = self._collection.find(params)
         return map(self._convert_document_to_advert, documents)
     
     def save(self, advert):

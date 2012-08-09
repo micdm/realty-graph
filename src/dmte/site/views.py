@@ -61,7 +61,7 @@ def graph(**kwargs):
     if not _validate_graph_params(kwargs):
         return None, 404
     graph_builder = GraphBuilder()
-    graph = graph_builder.build(**kwargs)
+    graph = graph_builder.build(kwargs)
     response = make_response(graph)
     response.mimetype = 'image/png'
     return response
