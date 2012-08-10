@@ -41,7 +41,7 @@ class GraphDrawer(object):
     GRAPH_WIDTH = 900
     GRAPH_HEIGHT = 300
     
-    # Цвета:
+    # Цвета и шрифты:
     BACKGROUND_COLOR = 'white'
     LINE_COLOR = 'black'
     CURRENT_LEVEL_COLOR = 'lightgray'

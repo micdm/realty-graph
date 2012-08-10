@@ -1,0 +1,5 @@
+# Getting new source data.
+
+PROJECT_DIR=/home/share/www/realty-graph
+
+@daily $PROJECT_DIR/bin/python $PROJECT_DIR/project/src/get_source_data.py new > /var/log/realty-graph.log 2>&1
