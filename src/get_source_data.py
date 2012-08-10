@@ -27,6 +27,7 @@ def save_advert(advert):
         logger.debug('advert with external id %s found', advert.external_id)
         advert.id = stored.id
     processor.save(advert)
+    return stored is None
 
 def parse_page(url, new_only):
     '''
