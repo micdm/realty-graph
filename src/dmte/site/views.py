@@ -6,6 +6,7 @@
 
 from flask import Flask, make_response, request, render_template, url_for
 
+from dmte.conf import settings
 from dmte.graphics import GraphBuilder
 from dmte.processors import AdvertProcessor
 
@@ -20,7 +21,7 @@ def index():
     aggregated = processor.get_aggregated()
     graph_url = url_for('graph', type=request.args.get('type') or 'all', district=request.args.get('district') or 'all',
                         floor_number=request.args.get('floor_number') or 0, room_count=request.args.get('room_count') or 0)
-    return render_template('index.html', aggregated=aggregated, graph_url=graph_url)
+    return render_template('index.html', debug=settings.DEBUG, aggregated=aggregated, graph_url=graph_url)
 
 def _validate_graph_param(aggregated, params, key, default):
     '''
