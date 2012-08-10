@@ -8,6 +8,12 @@
 DEBUG = False
 DEBUG_LOG = DEBUG
 
+# Настройки HTTP-сервера:
+HTTP_SERVER = {
+    'host': 'localhost',
+    'port': 5000
+}
+
 # Настройки БД:
 MONGO_DB = {
     'host': 'localhost',

@@ -7,4 +7,4 @@
 from dmte.conf import settings
 from dmte.site.views import app
 
-app.run(debug=settings.DEBUG)
+app.run(settings.HTTP_SERVER['host'], settings.HTTP_SERVER['port'], settings.DEBUG)
