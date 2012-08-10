@@ -6,6 +6,7 @@
 
 from pymongo import Connection
 
+from dmte.conf import settings
 from dmte.models import Advert
 
 class MongoDb(object):
@@ -24,7 +25,7 @@ class MongoDb(object):
         @return: Connection
         '''
         if cls._connection is None:
-            cls._connection = Connection('192.168.1.3', 27017)
+            cls._connection = Connection(settings.MONGO_DB['host'], settings.MONGO_DB['port'])
         return cls._connection
     
     @classmethod
@@ -34,7 +35,8 @@ class MongoDb(object):
         @return: Database
         '''
         connection = cls._get_connection()
-        return connection['tomsk-estate']
+        db_name = settings.MONGO_DB['db_name']
+        return connection[db_name]
 
 class AdvertProcessor(object):
     
