@@ -35,7 +35,7 @@ class GraphDrawer(object):
     
     # Размеры картинки:
     IMAGE_WIDTH = 900
-    IMAGE_HEIGHT = 350
+    IMAGE_HEIGHT = 330
     
     # Размеры графика:
     GRAPH_WIDTH = 900
@@ -43,6 +43,7 @@ class GraphDrawer(object):
     
     # Цвета и шрифты:
     BACKGROUND_COLOR = 'white'
+    BORDER_COLOR = 'lightgray'
     LINE_COLOR = 'black'
     CURRENT_LEVEL_COLOR = 'lightgray'
     TEXT_LABEL_COLOR = 'lightgray'
@@ -110,8 +111,15 @@ class GraphDrawer(object):
         @return: float, float
         '''
         x = self._get_value_x(bounds['min_x'].x, bounds['max_x'].x, point.x)
-        y = self._get_value_y(bounds['min_y'].y, bounds['max_y'].y, point.y)
+        y = self._get_value_y(0, bounds['max_y'].y, point.y)
         return x, y
+    
+    def _draw_border(self, draw):
+        '''
+        Рисует рамку.
+        @param draw: Draw
+        '''
+        draw.rectangle((0, 0, self.GRAPH_WIDTH - 1, self.GRAPH_HEIGHT - 1), outline=self.BORDER_COLOR)
     
     def _draw_points(self, draw, points, bounds):
         '''
@@ -174,7 +182,7 @@ class GraphDrawer(object):
         Рисует подпись к графику.
         @param text: str
         '''
-        draw.text((0, self.GRAPH_HEIGHT), text, fill=self.TEXT_COLOR, font=self.TEXT_FONT)
+        draw.text((0, self.GRAPH_HEIGHT + 2), text, fill=self.TEXT_COLOR, font=self.TEXT_FONT)
 
     def draw(self, points, legend):
         '''
@@ -186,6 +194,7 @@ class GraphDrawer(object):
         image = self._get_new_image()
         draw = ImageDraw.Draw(image)
         bounds = self._get_bounds(points)
+        self._draw_border(draw)
         self._draw_points(draw, points, bounds)
         self._draw_labels(draw, bounds)
         self._draw_current_level(draw, bounds)
@@ -200,6 +209,10 @@ class GraphBuilder(object):
     # Интервал для выборки данных (дни):
     ADVERT_MAX_AGE = 180
     
+    # Максимальное значение отношения суммы объявления к средней сумме группы,
+    # после достижения которого объявление считается плохим:
+    FIX_RATIO = 3.0
+    
     def _get_adverts(self, params):
         '''
         Возвращает объявления по критериям.
@@ -209,50 +222,59 @@ class GraphBuilder(object):
         params['publication_date'] = {'$gt': datetime.utcnow() - timedelta(days=self.ADVERT_MAX_AGE)}
         return processor.get_by_info(params)
     
+    def _get_average(self, adverts):
+        '''
+        Возвращает среднее для списка объявлений.
+        @param adverts: list
+        @return: float
+        '''
+        price = sum(advert.price for advert in adverts)
+        area = sum(advert.area for advert in adverts)
+        return price / area
+    
+    def _fix_groupped(self, groupped):
+        '''
+        Возвращает подправленные данные: убирает объявления, сильно отклоняющиеся
+        от средних значений.
+        @param groupped: dict
+        @return: dict
+        '''
+        fixed = {}
+        for publication_date, adverts in groupped.items():
+            total_average = self._get_average(adverts)
+            fixed_group = []
+            for advert in adverts:
+                average = advert.price / advert.area
+                if 1 / self.FIX_RATIO < average / total_average < self.FIX_RATIO:
+                    fixed_group.append(advert)
+            if fixed_group:
+                fixed[publication_date] = fixed_group
+        return fixed
+    
     def _group_by_date(self, adverts):
         '''
-        Возвращает общие площадь и сумму объявлений, сгруппированные по дате.
+        Возвращает объявления, сгруппированные по дате.
         @param adverts: list
         @return: dict
         '''
         groupped = {}
         for advert in adverts:
             if advert.publication_date not in groupped:
-                groupped[advert.publication_date] = {
-                    'area': 0,
-                    'price': 0,
-                }
-            group = groupped[advert.publication_date]
-            group['area'] += advert.area
-            group['price'] += advert.price
-        return groupped
-    
-    def _get_average(self, groupped):
+                groupped[advert.publication_date] = []
+            groupped[advert.publication_date].append(advert)
+        return self._fix_groupped(groupped)
+
+    def _get_groupped_average(self, groupped):
         '''
         Возвращает средние цены за квадратный метр, сгруппированные по дате.
         @param groupped: dict
         @return: dict
         '''
-        return dict((key, group['price'] / group['area']) for key, group in groupped.items())
-    
-    def _get_filtered(self, average):
-        '''
-        Возвращает отфильтрованные данные без резких пиков.
-        @param average: dict
-        @return: dict
-        '''
-        result = {}
-        prev_value = None
-        for key, value in average.items():
-            if prev_value is None:
-                prev_value = value
-                continue
-            percent = value / prev_value
-            if percent > 0.6 and percent < 1.4:
-                result[key] = value
-                prev_value = value
-        return result
-    
+        average = {}
+        for publication_date, adverts in groupped.items():
+            average[publication_date] = self._get_average(adverts)
+        return average
+
     def _get_graph_legend(self, params):
         '''
         Возвращает легенду для графика.
@@ -302,6 +324,5 @@ class GraphBuilder(object):
         '''
         adverts = self._get_adverts(params)
         groupped = self._group_by_date(adverts)
-        average = self._get_average(groupped)
-        filtered = self._get_filtered(average)
-        return self._build_graph(filtered, params)
+        average = self._get_groupped_average(groupped)
+        return self._build_graph(average, params)
