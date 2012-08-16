@@ -2,7 +2,10 @@ body {
     padding: 60px 0px;
 }
 
-.social {
+#social {
     float: right;
-    margin-right: 10px;
+}
+
+#graph_container {
+
 }

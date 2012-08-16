@@ -4,6 +4,7 @@
         <title>Недвижимость Томска в графиках</title>
         <meta charset="utf8">
         <meta name="description" content="Динамика цен на недвижимость в г. Томске - наглядно.">
+        <meta name="keywords" content="Томск, недвижимость, график, динамика, средняя цена, аналитика">
         <link rel="shortcut icon" href="/static/favicon.ico">
         
         <link href="/static/css/bootstrap.css" rel="stylesheet">
@@ -29,7 +30,7 @@
             <div class="row">
                 <div class="span12">
                     <div>
-                        <div class="social">
+                        <div id="social">
                             <script type="text/javascript"><!--
                             document.write(VK.Share.button(false,{type: "round", text: "Рассказать"}));
                             --></script>
@@ -83,13 +84,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="span12">
+                <div id="graph_container" class="span12">
                     <img src="{{ graph_url }}" alt="Динамика цен">
                 </div>
             </div>
             <div class="row">
                 <div class="span12">
-                    <p>На графике показана динамика средних цен в рублях за квадратный метр за последние полгода.</p>
+                    <p>На графике показана динамика средних цен в рублях за квадратный метр за последние полгода для города Томска.</p>
                     <p>Данные получены с популярного томского сайта с бесплатными объявлениями о недвижимости.</p>
                 </div>
             </div>
