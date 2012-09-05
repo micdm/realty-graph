@@ -1,10 +1,10 @@
 <uwsgi>
-    <socket>/run/uwsgi/app/realty-graph/socket</socket>
+    <socket>/var/run/uwsgi/realty-graph.sock</socket>
     <workers>5</workers>
     <master/>
-    <chdir>/home/share/www/realty-graph/project/src/</chdir>
+    <chdir>/home/www/realty-graph.tom.ru/project/src/</chdir>
     <plugins>python</plugins>
-    <virtualenv>/home/share/www/realty-graph/</virtualenv>
+    <virtualenv>/home/www/realty-graph.tom.ru/</virtualenv>
     <module>dmte.site.views</module>
     <callable>app</callable>
 </uwsgi>
