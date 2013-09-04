@@ -1,6 +1,6 @@
 <uwsgi>
     <socket>/var/run/uwsgi/realty-graph.sock</socket>
-    <workers>5</workers>
+    <workers>2</workers>
     <master/>
     <chdir>/home/www/realty-graph.tom.ru/project/src/</chdir>
     <plugins>python</plugins>
